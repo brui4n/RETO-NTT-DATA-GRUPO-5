@@ -127,6 +127,24 @@
   color: #1E3A5F;
 }
 
+/* React Markdown Styles inner .aiText */
+.aiText p {
+  margin: 0 0 0.8em 0;
+}
+.aiText p:last-child {
+  margin-bottom: 0;
+}
+.aiText ul, .aiText ol {
+  margin: 0.5em 0 1em 1.5em;
+  padding: 0;
+}
+.aiText li {
+  margin-bottom: 0.4em;
+}
+.aiText strong {
+  font-weight: 700;
+}
+
 /* Timeline */
 .timeline {
   display: flex;

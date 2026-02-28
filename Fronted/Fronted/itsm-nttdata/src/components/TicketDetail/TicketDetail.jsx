@@ -1,3 +1,4 @@
+import ReactMarkdown from 'react-markdown'
 import Badge from '../Badge/Badge'
 import { getTypeLabel, getPriorityLabel, getStatusLabel } from '../../utils/aiClassification'
 import { formatDate } from '../../utils/formatDate'
@@ -59,6 +60,7 @@ export default function TicketDetail({ ticket }) {
           Datos del Usuario Creador
         </h3>
         <div className={styles.userGrid}>
+            {/* User Details */}
           <div className={styles.userItem}>
             <User size={16} className={styles.userIcon} />
             <div>
@@ -134,7 +136,9 @@ export default function TicketDetail({ ticket }) {
           <Bot size={18} />
           Análisis de IA
         </h3>
-        <p className={styles.aiText}>{ticket.aiResponse}</p>
+        <div className={styles.aiText}>
+          <ReactMarkdown>{ticket.aiResponse}</ReactMarkdown>
+        </div>
       </section>
 
       {/* History */}

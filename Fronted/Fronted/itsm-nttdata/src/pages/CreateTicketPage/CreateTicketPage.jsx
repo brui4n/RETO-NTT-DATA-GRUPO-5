@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
+import ReactMarkdown from 'react-markdown'
 import { Send, Sparkles, User, Mail, Briefcase, Building2, FileText, AlignLeft } from 'lucide-react'
 import { getTypeLabel, getPriorityLabel } from '../../utils/aiClassification'
 import { addTicket } from '../../utils/storage'
@@ -113,7 +114,9 @@ export default function CreateTicketPage() {
               <Sparkles size={18} />
               <span>Respuesta Integral de la Inteligencia Artificial</span>
             </div>
-            <p className={styles.aiResultText}>{result.aiResponse}</p>
+            <div className={styles.aiResultText}>
+              <ReactMarkdown>{result.aiResponse}</ReactMarkdown>
+            </div>
           </div>
 
           <div className={styles.successActions}>

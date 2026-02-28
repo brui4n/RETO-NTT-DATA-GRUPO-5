@@ -94,6 +94,14 @@
   gap: 0.4rem;
 }
 
+.fieldset > .formGroup {
+  margin-bottom: 1.25rem;
+}
+
+.fieldset > .formGroup:last-child {
+  margin-bottom: 0;
+}
+
 .label {
   font-size: 0.85rem;
   font-weight: 600;

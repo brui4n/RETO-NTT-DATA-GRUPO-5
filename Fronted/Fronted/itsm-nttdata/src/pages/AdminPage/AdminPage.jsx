@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import toast from 'react-hot-toast'
 import {
   Ticket, CircleDot, Loader2, CheckCircle2, AlertTriangle,
-  Inbox
+  Inbox, ChevronLeft, ChevronRight
 } from 'lucide-react'
 import StatCard from '../../components/StatCard/StatCard'
 import TicketCard from '../../components/TicketCard/TicketCard'
@@ -18,10 +18,19 @@ export default function AdminPage() {
   const [filters, setFilters] = useState({ priority: '', type: '', status: '', search: '' })
   const [detailModal, setDetailModal] = useState({ open: false, ticket: null })
   const [assignModal, setAssignModal] = useState({ open: false, ticketId: null })
+  
+  // Pagination State
+  const [currentPage, setCurrentPage] = useState(1)
+  const ITEMS_PER_PAGE = 5
 
   useEffect(() => {
     getTickets().then(setTickets)
   }, [])
+
+  // Reset page when filters change
+  useEffect(() => {
+    setCurrentPage(1)
+  }, [filters])
 
   // Stats
   const stats = useMemo(() => ({
@@ -52,6 +61,13 @@ export default function AdminPage() {
 
     return result
   }, [tickets, filters])
+
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredTickets.length / ITEMS_PER_PAGE)
+  const currentTickets = useMemo(() => {
+    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE
+    return filteredTickets.slice(startIndex, startIndex + ITEMS_PER_PAGE)
+  }, [filteredTickets, currentPage])
 
   // Handlers
   const handleView = async (ticketId) => {
@@ -128,6 +144,8 @@ export default function AdminPage() {
         )}
       </div>
 
+
+
       {/* Filters */}
       <TicketFilters
         filters={filters}
@@ -156,7 +174,7 @@ export default function AdminPage() {
           </div>
         ) : (
           <div className={styles.ticketsList}>
-            {filteredTickets.map((ticket) => (
+            {currentTickets.map((ticket) => (
               <TicketCard
                 key={ticket.id}
                 ticket={ticket}
@@ -165,6 +183,31 @@ export default function AdminPage() {
                 onResolve={handleResolve}
               />
             ))}
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className={styles.pagination}>
+            <button
+              className={styles.pageBtn}
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              <ChevronLeft size={18} />
+              Anterior
+            </button>
+            <span className={styles.pageInfo}>
+              Página <strong>{currentPage}</strong> de <strong>{totalPages}</strong>
+            </span>
+            <button
+              className={styles.pageBtn}
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Siguiente
+              <ChevronRight size={18} />
+            </button>
           </div>
         )}
       </div>

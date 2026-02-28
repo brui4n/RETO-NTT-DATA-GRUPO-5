@@ -1,10 +1,13 @@
-import { Eye, UserPlus, CheckCircle, AlertTriangle, Clock, ArrowUpRight } from 'lucide-react'
+import { useState } from 'react'
+import ReactMarkdown from 'react-markdown'
+import { Eye, UserPlus, CheckCircle, AlertTriangle, Clock, ArrowUpRight, ChevronDown, ChevronUp } from 'lucide-react'
 import Badge from '../Badge/Badge'
 import { getTypeLabel, getPriorityLabel, getStatusLabel } from '../../utils/aiClassification'
 import { timeAgo } from '../../utils/formatDate'
 import styles from './TicketCard.module.css'
 
 export default function TicketCard({ ticket, onView, onAssign, onResolve }) {
+  const [isAiExpanded, setIsAiExpanded] = useState(false)
   const isAssignable = !ticket.assignedTo && ticket.status === 'open'
   const isResolvable = ticket.status === 'in-progress'
 
@@ -38,9 +41,26 @@ export default function TicketCard({ ticket, onView, onAssign, onResolve }) {
       )}
 
       {ticket.aiResponse && (
-        <div className={styles.aiHint}>
-          <span className={styles.aiIcon}>IA</span>
-          <span>{ticket.aiResponse}</span>
+        <div className={styles.aiHintContainer}>
+          <button 
+            className={styles.aiToggleBtn} 
+            onClick={() => setIsAiExpanded(!isAiExpanded)}
+            title={isAiExpanded ? "Ocultar Análisis IA" : "Ver Análisis IA"}
+          >
+            <div className={styles.aiToggleLeft}>
+              <span className={styles.aiIcon}>IA</span>
+              <span>Análisis de Inteligencia Artificial</span>
+            </div>
+            {isAiExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </button>
+          
+          {isAiExpanded && (
+            <div className={styles.aiHint}>
+              <div className={styles.aiContent}>
+                <ReactMarkdown>{ticket.aiResponse}</ReactMarkdown>
+              </div>
+            </div>
+          )}
         </div>
       )}
 

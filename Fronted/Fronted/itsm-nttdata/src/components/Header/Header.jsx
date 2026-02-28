@@ -1,5 +1,5 @@
 import { NavLink, useLocation } from 'react-router-dom'
-import { PlusCircle, LayoutDashboard, Bot } from 'lucide-react'
+import { PlusCircle, LayoutDashboard, Bot, BarChart3 } from 'lucide-react'
 import styles from './Header.module.css'
 
 export default function Header() {
@@ -36,6 +36,15 @@ export default function Header() {
           >
             <LayoutDashboard size={18} />
             <span>Gestión de Tickets</span>
+          </NavLink>
+          <NavLink
+            to="/stats"
+            className={({ isActive }) =>
+              `${styles.navBtn} ${isActive ? styles.navBtnActive : ''}`
+            }
+          >
+            <BarChart3 size={18} />
+            <span>Estadísticas</span>
           </NavLink>
         </nav>
       </div>

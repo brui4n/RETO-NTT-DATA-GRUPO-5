@@ -34,7 +34,8 @@ def process_ticket(ticket_data: dict) -> dict:
     
     initial_state = {
         "ticket_id": ticket_data.get("id"),
-        "user_id": ticket_data.get("user_id", "Usuario Anónimo"),
+        "user_id": ticket_data.get("user_id", 0),
+        "title": ticket_data.get("title", ""),
         "description": ticket_data.get("description", ""),
         "messages": []
     }

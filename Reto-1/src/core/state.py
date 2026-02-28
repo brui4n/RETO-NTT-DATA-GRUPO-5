@@ -5,20 +5,19 @@ class TicketState(TypedDict):
     """
     Representa el estado del ticket a medida que fluye por la máquina de estados de LangGraph.
     """
-    ticket_id: Optional[int]
-    user_id: str
+    ticket_id: str # Ej: INC-000001
+    user_id: int
+    title: str
     description: str
     
     # Datos enriquecidos por el Agente Clasificador
-    category: Optional[str]
-    ticket_type: Optional[str] # Incidente, Requerimiento, Problema
+    ticket_type: Optional[str] # incident, request, problem
     
     # Datos enriquecidos por el Agente de Priorización
-    priority: Optional[str] # Baja, Media, Alta, Crítica
-    priority_justification: Optional[str]
+    priority: Optional[str] # low, medium, high, critical
     
-    # Datos enriquecidos por el Agente de Soporte
-    suggested_resolution: Optional[str]
+    # Datos enriquecidos por el Agente de Soporte (Englobando justificación y ayuda)
+    ai_response: Optional[str]
     
-    # Historial de mensajes (útil si hay ambigüedad y necesitamos pedir más info)
+    # Historial de mensajes 
     messages: List[BaseMessage]

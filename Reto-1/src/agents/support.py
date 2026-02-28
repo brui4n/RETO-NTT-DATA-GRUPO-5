@@ -4,8 +4,8 @@ from src.core.state import TicketState
 from src.core.llm import get_llm
 
 class SupportOutput(BaseModel):
-    suggested_resolution: str = Field(
-        description="Respuesta profesional, empática y accionable, recomendando unos pasos de solución o informando al usuario de la acción tomada."
+    ai_response: str = Field(
+        description="Respuesta profesional enviada al panel ITSM, engloba de forma educada una justificación de la categoría/prioridad asignada y una sugerencia de resolución."
     )
 
 def support_node(state: TicketState) -> dict:
@@ -14,34 +14,33 @@ def support_node(state: TicketState) -> dict:
     """
     prompt = ChatPromptTemplate.from_messages([
         ("system", 
-         "Eres un Especialista de Soporte TI Nivel 2. "
-         "Tu trabajo es leer un incidente clasificado y generar una respuesta amable, clara y accionable.\n"
+         "Eres la Inteligencia Artificial del sistema ITSM. "
+         "Tu trabajo es leer la clasificación y prioridad de un ticket y generar un 'AI Response' amigable y estructurado.\n"
          "Instrucciones:\n"
-         "- Si es de red/VPN, sugiere verificar conexión a internet o reiniciar credenciales.\n"
-         "- Si es hardware averiado, informa que un técnico irá al lugar pronto.\n"
-         "- Si es contraseña/acceso, remite al portal de autoservicio (ej. password.empresa.local).\n"
-         "- Sé directo pero empático."
+         "- Justifica brevemente por qué se dio esa prioridad/tipo basado en el reporte.\n"
+         "- Sugiere de 1 a 3 pasos técnicos concretos de resolución para que el técnico lo copie o el usuario lo aplique.\n"
+         "- Si es prioridad 'critical' o 'high', menciónalo explícitamente y usa emojis de alerta 🚨/🔴.\n"
+         "- Sé directo, empático y profesional."
         ),
         ("human", 
+         "**Título:** {title}\n"
          "**Ticket crudo:** {description}\n"
-         "**Categoría:** {category}\n"
          "**Tipo:** {ticket_type}\n"
          "**Prioridad asignada:** {priority}\n\n"
-         "Redacta la respuesta sugerida:"
+         "Redacta el AI Response:"
         )
     ])
     
-    # Usamos algo de temperatura para que las respuestas suenen naturales y variadas
     llm = get_llm(temperature=0.3).with_structured_output(SupportOutput)
     chain = prompt | llm
     
     result: SupportOutput = chain.invoke({
+        "title": state.get("title", ""),
         "description": state["description"],
-        "category": state.get("category", "N/A"),
         "ticket_type": state.get("ticket_type", "N/A"),
         "priority": state.get("priority", "N/A")
     })
     
     return {
-        "suggested_resolution": result.suggested_resolution
+        "ai_response": result.ai_response
     }

@@ -5,39 +5,36 @@ from src.core.state import TicketState
 from src.core.llm import get_llm
 
 class ClassificationOutput(BaseModel):
-    ticket_type: Literal["Incidente", "Requerimiento", "Problema", "Duda/Consulta"] = Field(
+    ticket_type: Literal["incident", "request", "problem"] = Field(
         description=(
-            "Clasifica el ticket según las mejores prácticas ITSM:\n"
-            "- Incidente: Interrupción no planificada de un servicio de TI o reducción de su calidad (ej. laptop no enciende, error en sistema).\n"
-            "- Requerimiento: Solicitud formal de un nuevo servicio o acceso (ej. instalar software, acceso a carpeta).\n"
-            "- Problema: Causa raíz de uno o más incidentes (generalmente no lo reporta un usuario común).\n"
-            "- Duda/Consulta: Pregunta general."
+            "Clasifica el ticket estrictamente en uno de estos tres tipos de ITSM:\n"
+            "- 'incident': Interrupción no planificada de un servicio (ej. laptop no enciende).\n"
+            "- 'request': Solicitud formal de un nuevo servicio o acceso (ej. instalar software).\n"
+            "- 'problem': Causa raíz de incidentes recurrentes."
         )
-    )
-    category: Literal["Hardware", "Software Corporativo", "Redes / VPN", "Accesos / Cuentas", "Correo Electrónico", "Otro"] = Field(
-        description="Categoría principal del asunto reportado."
     )
 
 def classifier_node(state: TicketState) -> dict:
     """
-    Analiza el texto del ticket y determina su tipo y categoría.
-    Retorna un diccionario con las claves a actualizar en el estado.
+    Analiza el texto del ticket y determina su tipo exacto para la base de datos SQL.
     """
     prompt = ChatPromptTemplate.from_messages([
         ("system", 
-         "Eres un analista experto de ServiceNow/Jira Service Management de nivel 1. "
-         "Tu objetivo es interpretar los reportes de los usuarios (incluso si están incompletos, mal redactados o ambiguos) "
-         "y transformarlos en información estructurada ITSM."
+         "Eres un analista experto de ServiceNow de nivel 1. "
+         "Tu objetivo es tipificar los reportes de los usuarios (incluso si están incompletos) "
+         "para inyectarlos en la base relacional de ITSM."
         ),
-        ("human", "Analiza el siguiente reporte del usuario:\n\n{description}")
+        ("human", "Analiza el siguiente reporte del usuario titulado '{title}':\n\n{description}")
     ])
     
     llm = get_llm(temperature=0).with_structured_output(ClassificationOutput)
     chain = prompt | llm
     
-    result: ClassificationOutput = chain.invoke({"description": state["description"]})
+    result: ClassificationOutput = chain.invoke({
+        "title": state.get("title", ""),
+        "description": state["description"]
+    })
     
     return {
-        "ticket_type": result.ticket_type,
-        "category": result.category
+        "ticket_type": result.ticket_type
     }

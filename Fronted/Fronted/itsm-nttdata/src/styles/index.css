@@ -1,0 +1,127 @@
+/* ================================
+   NTT DATA ITSM - Global Styles
+   ================================ */
+
+:root {
+  --ntt-blue: #0066CC;
+  --ntt-dark-blue: #004999;
+  --ntt-light-blue: #3399FF;
+  --ntt-accent: #00A3E0;
+  --ntt-gray: #F7F8FA;
+  --ntt-dark-gray: #2D3748;
+  --ntt-medium-gray: #718096;
+  --ntt-border: #E2E8F0;
+  --ntt-border-light: #EDF2F7;
+  --success: #38A169;
+  --success-bg: #F0FFF4;
+  --warning: #D69E2E;
+  --warning-bg: #FFFFF0;
+  --danger: #E53E3E;
+  --danger-bg: #FFF5F5;
+  --info: #3182CE;
+  --info-bg: #EBF8FF;
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 10px 30px rgba(0, 0, 0, 0.1);
+  --shadow-blue: 0 4px 14px rgba(0, 102, 204, 0.15);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: var(--ntt-gray);
+  color: var(--ntt-dark-gray);
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ================================
+   Scrollbar
+   ================================ */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #CBD5E0;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A0AEC0;
+}
+
+/* ================================
+   Focus styles
+   ================================ */
+*:focus-visible {
+  outline: 2px solid var(--ntt-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* ================================
+   Selection
+   ================================ */
+::selection {
+  background: var(--ntt-blue);
+  color: white;
+}
+
+/* ================================
+   Animations
+   ================================ */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.4s ease-out;
+}

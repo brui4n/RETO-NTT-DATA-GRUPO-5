@@ -3,13 +3,8 @@ import { useEffect } from 'react'
 import Header from './components/Header/Header'
 import CreateTicketPage from './pages/CreateTicketPage/CreateTicketPage'
 import AdminPage from './pages/AdminPage/AdminPage'
-import { seedSampleData } from './utils/storage'
 
 export default function App() {
-  useEffect(() => {
-    seedSampleData()
-  }, [])
-
   return (
     <>
       <Header />

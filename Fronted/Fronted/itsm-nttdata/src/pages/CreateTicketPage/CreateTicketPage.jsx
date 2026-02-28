@@ -2,8 +2,8 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import toast from 'react-hot-toast'
 import { Send, Sparkles, User, Mail, Briefcase, Building2, FileText, AlignLeft } from 'lucide-react'
-import { classifyTicket, generateAIResponse, getTypeLabel, getPriorityLabel } from '../../utils/aiClassification'
-import { addTicket, getNextTicketId } from '../../utils/storage'
+import { getTypeLabel, getPriorityLabel } from '../../utils/aiClassification'
+import { addTicket } from '../../utils/storage'
 import styles from './CreateTicketPage.module.css'
 
 export default function CreateTicketPage() {
@@ -48,53 +48,28 @@ export default function CreateTicketPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value })
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     setSubmitting(true)
 
-    // Simulate a brief AI processing delay for UX
-    setTimeout(() => {
-      const classification = classifyTicket(formData.description)
-      const aiResponse = generateAIResponse(classification.type, classification.priority)
-      const ticketId = getNextTicketId()
-
-      const ticket = {
-        id: ticketId,
-        user: {
-          name: formData.name,
-          email: formData.email,
-          puesto: formData.puesto,
-          area: formData.area,
-        },
+    try {
+      // Usar un usuario genérico del backend (ej: id 2 en BD SQLite = Juan Perez)
+      const ticketPayload = {
+        user_id: 2, 
         title: formData.title,
-        description: formData.description,
-        type: classification.type,
-        priority: classification.priority,
-        status: 'open',
-        assignedTo: null,
-        aiResponse,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-        history: [
-          {
-            action: 'Ticket creado',
-            timestamp: new Date().toISOString(),
-            user: formData.name,
-          },
-          {
-            action: `Clasificado como ${classification.type.toUpperCase()} - ${classification.priority.toUpperCase()} por IA`,
-            timestamp: new Date().toISOString(),
-            user: 'Sistema IA',
-          },
-        ],
+        description: formData.description
       }
 
-      addTicket(ticket)
+      const ticketRes = await addTicket(ticketPayload)
+      
+      setResult(ticketRes)
+      toast.success(`Ticket ${ticketRes.id} creado exitosamente con LangGraph Llama 3`)
+    } catch (err) {
+      toast.error('Error al enviar el ticket, verifica el servidor FastAPI')
+      console.error(err)
+    } finally {
       setSubmitting(false)
-      setResult({ ticket, classification, aiResponse })
-
-      toast.success(`Ticket ${ticketId} creado exitosamente`)
-    }, 800)
+    }
   }
 
   const handleReset = () => {
@@ -108,24 +83,24 @@ export default function CreateTicketPage() {
         <div className={`${styles.card} ${styles.successCard}`}>
           <div className={styles.successHeader}>
             <div className={styles.successIcon}>✓</div>
-            <h2 className={styles.successTitle}>Ticket Creado Exitosamente</h2>
+            <h2 className={styles.successTitle}>Ticket Creado y Procesado por AI Exitosamente</h2>
             <p className={styles.successSubtitle}>
-              Tu ticket <strong>{result.ticket.id}</strong> ha sido registrado y clasificado por nuestra IA
+              Tu ticket <strong>{result.id}</strong> ha sido registrado y clasificado por nuestra IA (LangGraph Groq Hub)
             </p>
           </div>
 
           <div className={styles.resultGrid}>
             <div className={styles.resultItem}>
               <span className={styles.resultLabel}>ID del Ticket</span>
-              <span className={styles.resultValue}>{result.ticket.id}</span>
+              <span className={styles.resultValue}>{result.id}</span>
             </div>
             <div className={styles.resultItem}>
               <span className={styles.resultLabel}>Tipo (IA)</span>
-              <span className={styles.resultValue}>{getTypeLabel(result.classification.type)}</span>
+              <span className={styles.resultValue}>{getTypeLabel(result.type)}</span>
             </div>
             <div className={styles.resultItem}>
               <span className={styles.resultLabel}>Prioridad (IA)</span>
-              <span className={styles.resultValue}>{getPriorityLabel(result.classification.priority)}</span>
+              <span className={styles.resultValue}>{getPriorityLabel(result.priority)}</span>
             </div>
             <div className={styles.resultItem}>
               <span className={styles.resultLabel}>Estado</span>
@@ -136,7 +111,7 @@ export default function CreateTicketPage() {
           <div className={styles.aiResultBox}>
             <div className={styles.aiResultHeader}>
               <Sparkles size={18} />
-              <span>Respuesta de IA</span>
+              <span>Respuesta Integral de la Inteligencia Artificial</span>
             </div>
             <p className={styles.aiResultText}>{result.aiResponse}</p>
           </div>
@@ -146,7 +121,7 @@ export default function CreateTicketPage() {
               Crear otro ticket
             </button>
             <button className={styles.btnSecondary} onClick={() => navigate('/admin')}>
-              Ver gestión de tickets
+              Ir al Admin Inbox
             </button>
           </div>
         </div>

@@ -10,7 +10,7 @@ import TicketFilters from '../../components/TicketFilters/TicketFilters'
 import TicketDetail from '../../components/TicketDetail/TicketDetail'
 import AssignForm from '../../components/AssignForm/AssignForm'
 import Modal from '../../components/Modal/Modal'
-import { getTickets, updateTicket, saveTickets } from '../../utils/storage'
+import { getTickets, updateTicket } from '../../utils/storage'
 import styles from './AdminPage.module.css'
 
 export default function AdminPage() {
@@ -20,7 +20,7 @@ export default function AdminPage() {
   const [assignModal, setAssignModal] = useState({ open: false, ticketId: null })
 
   useEffect(() => {
-    setTickets(getTickets())
+    getTickets().then(setTickets)
   }, [])
 
   // Stats
@@ -46,7 +46,7 @@ export default function AdminPage() {
           t.id.toLowerCase().includes(q) ||
           t.title.toLowerCase().includes(q) ||
           t.description.toLowerCase().includes(q) ||
-          t.user.name.toLowerCase().includes(q)
+          (t.user && t.user.name && t.user.name.toLowerCase().includes(q))
       )
     }
 
@@ -54,7 +54,7 @@ export default function AdminPage() {
   }, [tickets, filters])
 
   // Handlers
-  const handleView = (ticketId) => {
+  const handleView = async (ticketId) => {
     const ticket = tickets.find((t) => t.id === ticketId)
     if (ticket) setDetailModal({ open: true, ticket })
   }
@@ -63,61 +63,27 @@ export default function AdminPage() {
     setAssignModal({ open: true, ticketId })
   }
 
-  const handleAssign = (ticketId, assignedTo) => {
-    const updated = getTickets().map((t) => {
-      if (t.id === ticketId) {
-        return {
-          ...t,
-          assignedTo,
-          status: 'in-progress',
-          updatedAt: new Date().toISOString(),
-          history: [
-            ...t.history,
-            {
-              action: `Asignado a ${assignedTo.name}`,
-              timestamp: new Date().toISOString(),
-              user: 'Administrador',
-            },
-            {
-              action: 'Estado cambiado a EN PROCESO',
-              timestamp: new Date().toISOString(),
-              user: 'Sistema',
-            },
-          ],
-        }
-      }
-      return t
-    })
-
-    saveTickets(updated)
-    setTickets(updated)
-    setAssignModal({ open: false, ticketId: null })
-    toast.success(`Ticket ${ticketId} asignado a ${assignedTo.name}`)
+  const handleAssign = async (ticketId, assignedTo) => {
+    try {
+      await updateTicket(ticketId, { assignedTo: assignedTo }) // Asignación
+      const updated = await getTickets()
+      setTickets(updated)
+      setAssignModal({ open: false, ticketId: null })
+      toast.success(`Ticket ${ticketId} asignado a ${assignedTo.name}`)
+    } catch(e) {
+      toast.error('Error asignando ticket al personal')
+    }
   }
 
-  const handleResolve = (ticketId) => {
-    const updated = getTickets().map((t) => {
-      if (t.id === ticketId) {
-        return {
-          ...t,
-          status: 'resolved',
-          updatedAt: new Date().toISOString(),
-          history: [
-            ...t.history,
-            {
-              action: 'Marcado como resuelto',
-              timestamp: new Date().toISOString(),
-              user: 'Administrador',
-            },
-          ],
-        }
-      }
-      return t
-    })
-
-    saveTickets(updated)
-    setTickets(updated)
-    toast.success(`Ticket ${ticketId} marcado como resuelto`)
+  const handleResolve = async (ticketId) => {
+    try {
+      await updateTicket(ticketId, { status: 'resolved' })
+      const updated = await getTickets()
+      setTickets(updated)
+      toast.success(`Ticket ${ticketId} marcado como resuelto`)
+    } catch(e) {
+      toast.error('Error marcando ticket como resuelto')
+    }
   }
 
   const handleClearFilters = () => {

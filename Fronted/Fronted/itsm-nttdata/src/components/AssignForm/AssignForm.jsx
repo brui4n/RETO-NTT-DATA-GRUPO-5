@@ -1,13 +1,17 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { UserPlus } from 'lucide-react'
 import { getStaffUsers } from '../../utils/storage'
 import styles from './AssignForm.module.css'
 
 export default function AssignForm({ ticketId, onAssign, onCancel }) {
-  const staffUsers = getStaffUsers()
+  const [staffUsers, setStaffUsers] = useState([])
   const [mode, setMode] = useState('select') // 'select' or 'manual'
   const [selectedStaff, setSelectedStaff] = useState('')
   const [manualData, setManualData] = useState({ name: '', email: '', puesto: '' })
+
+  useEffect(() => {
+    getStaffUsers().then(setStaffUsers)
+  }, [])
 
   const handleSubmit = (e) => {
     e.preventDefault()

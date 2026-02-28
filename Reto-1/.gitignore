@@ -1,0 +1,32 @@
+# Entornos virtuales
+venv/
+.venv/
+env/
+.env_dir/
+
+# Variables de entorno y secretos
+.env
+.env.*
+*.env
+
+# Cache de Python y bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Bases de datos locales
+*.db
+*.sqlite3
+
+# Logs y SO
+*.log
+.DS_Store
+Thumbs.db
+
+# Configuración IDE
+.vscode/
+.idea/
+
+# LangGraph checkpoints
+.langgraph_checkpoints/
